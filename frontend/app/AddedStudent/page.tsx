@@ -1,41 +1,37 @@
-'use client'
+"use client";
 import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+
+interface Student {
+  id: number;
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+}
 
 const Students = () => {
-  const {id} = useParams();
-  const [users, setUsers] = useState([
-    {
-      id,
-      name: "",
-      email: "",
-      username: "",
-      password: "",
-    }
-  ]);
+  const [users, setUsers] = useState<Student[]>([]);
 
   useEffect(() => {
     getUsers();
   }, []);
 
-  function getUsers() {
-    axios.get('http://localhost:8000/api/students')
-      .then(response => {
-        setUsers(response.data);
-      })
-      .catch(error => {
-        console.error("Error fetching students:", error);
-      });
-  }
+  const getUsers = async () => {
+    try {
+      const response = await axios.get<Student[]>("http://localhost:8000/api/students");
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
+  };
 
-  const deleteUser = (id: string | number) => {
+  const deleteUser = (id: number) => {
     axios.delete(`http://localhost:8000/api/delete/${id}`)
-      .then((response) => {
-        console.log(response.data);
+      .then(() => {
         getUsers();
       })
       .catch((error) => {
@@ -58,8 +54,8 @@ const Students = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((student, index) => (
-            <TableRow key={index}>
+          {users.map((student) => (
+            <TableRow key={student.id}>
               <TableCell>{student.id}</TableCell>
               <TableCell>{student.name}</TableCell>
               <TableCell>{student.email}</TableCell>
@@ -70,7 +66,11 @@ const Students = () => {
                   <Button variant="outline" size="sm">
                     <Link href={`/Edit/${student.id}`}>Edit</Link>
                   </Button>
-                  <Button onClick={() => deleteUser(student.id)} variant="destructive" size="sm">
+                  <Button 
+                    onClick={() => deleteUser(student.id)} 
+                    variant="destructive" 
+                    size="sm"
+                  >
                     Delete
                   </Button>
                 </div>
