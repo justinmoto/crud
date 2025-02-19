@@ -8,12 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-// Define props explicitly
-interface EditStudentProps {
-  className?: string;
-}
-
-const EditStudent: React.FC<EditStudentProps> = ({ className }) => {
+const EditStudent = () => {
   const router = useRouter();
   const { id } = useParams<{ id: string }>(); // Ensure `id` is a string
   const [inputs, setInputs] = useState({
@@ -53,7 +48,7 @@ const EditStudent: React.FC<EditStudentProps> = ({ className }) => {
   };
 
   return (
-    <div className={`flex flex-col gap-6 ${className || ""}`}>
+    <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Edit Student</CardTitle>
