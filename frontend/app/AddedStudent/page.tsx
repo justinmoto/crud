@@ -32,12 +32,16 @@ const Students = () => {
       });
   }
 
-  const deleteUser = (id) => {
-    axios.delete(`http://localhost:8000/api/delete/${id}`).then(function(response){
-      console.log(response.data);
-      getUsers();
-    })
-  }
+  const deleteUser = (id: string | number) => {
+    axios.delete(`http://localhost:8000/api/delete/${id}`)
+      .then((response) => {
+        console.log(response.data);
+        getUsers();
+      })
+      .catch((error) => {
+        console.error("Error deleting student:", error);
+      });
+  };
 
   return (
     <div className="p-6">
