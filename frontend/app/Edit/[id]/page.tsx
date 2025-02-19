@@ -30,7 +30,7 @@ const EditStudent = ({ className, ...props }: React.ComponentPropsWithoutRef<"di
       });
     }
     catch(err){
-        console.error("Error fetching students");
+        console.error("Error fetching students", err);
     }
   }
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
