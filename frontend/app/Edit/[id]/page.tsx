@@ -1,53 +1,59 @@
-'use client'
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useParams } from "next/navigation"
-import { useState, useEffect } from "react"
-import axios from "axios"
-import { useRouter } from "next/navigation"
-const EditStudent = ({ className, ...props }: React.ComponentPropsWithoutRef<"div">) => {
+"use client";
+
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+// Define props explicitly
+interface EditStudentProps {
+  className?: string;
+}
+
+const EditStudent: React.FC<EditStudentProps> = ({ className }) => {
   const router = useRouter();
-  const [inputs,  setInputs] =useState({
+  const { id } = useParams<{ id: string }>(); // Ensure `id` is a string
+  const [inputs, setInputs] = useState({
     name: "",
     email: "",
     username: "",
   });
-  const {id} = useParams();
-  console.log(id);
 
   useEffect(() => {
-      getUser();
-    }, []);
+    if (id) getUser();
+  }, [id]);
 
-  const getUser = async() => {
+  const getUser = async () => {
     try {
-      axios.get(`http://localhost:8000/api/getuser/${id}`).then(function(response) {
-        console.log(response.data[0])
+      const response = await axios.get(`http://localhost:8000/api/getuser/${id}`);
+      if (response.data.length > 0) {
         setInputs(response.data[0]);
-      });
+      }
+    } catch (err) {
+      console.error("Error fetching student:", err);
     }
-    catch(err){
-        console.error("Error fetching students", err);
-    }
-  }
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target; // Now TypeScript knows it's an input element
+    const { name, value } = event.target;
     setInputs((values) => ({ ...values, [name]: value }));
   };
-  
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    axios.put(`http://localhost:8000/api/edit/${id}`, inputs).then(function(response){
-      console.log(response.data);
-      router.push('/AddedStudent')
-    })
-  }
+    try {
+      await axios.put(`http://localhost:8000/api/edit/${id}`, inputs);
+      router.push("/AddedStudent");
+    } catch (err) {
+      console.error("Error updating student:", err);
+    }
+  };
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={`flex flex-col gap-6 ${className || ""}`}>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Edit Student</CardTitle>
@@ -61,7 +67,7 @@ const EditStudent = ({ className, ...props }: React.ComponentPropsWithoutRef<"di
                   id="name"
                   name="name"
                   type="text"
-                  value={inputs.name || ''}
+                  value={inputs.name}
                   onChange={handleChange}
                   required
                 />
@@ -73,7 +79,7 @@ const EditStudent = ({ className, ...props }: React.ComponentPropsWithoutRef<"di
                   id="email"
                   name="email"
                   type="email"
-                  value={inputs.email || ''}
+                  value={inputs.email}
                   onChange={handleChange}
                   required
                 />
@@ -85,12 +91,11 @@ const EditStudent = ({ className, ...props }: React.ComponentPropsWithoutRef<"di
                   id="username"
                   name="username"
                   type="text"
-                  value={inputs.username || ''}
+                  value={inputs.username}
                   onChange={handleChange}
                   required
                 />
               </div>
-
 
               <Button type="submit" className="w-full">
                 Update Student
